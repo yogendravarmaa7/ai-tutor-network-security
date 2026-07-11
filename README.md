@@ -130,6 +130,31 @@ Open your browser at `http://localhost:8000`
 
 ---
 
+## ⚙️ Flow of Execution
+
+### Message Handling
+The `@cl.on_message` decorator triggers whenever a new message is received in the chat UI.
+
+### Main Function
+```python
+@cl.on_message
+async def main(message: cl.Message):
+    response = llm(message.content)
+    await cl.Message(content=response).send()
+```
+
+### LLM Function
+- Configures local embeddings
+- Connects to local vector store (`db/`)
+- Retrieves the most relevant context chunks
+- Generates and returns answers with citations
+
+### loadResourceDocuments()
+- Loads and vectorizes lecture slides, textbooks, and quizzes
+- Uses Chroma for persistent storage and future reuse
+
+---
+
 ## 💬 Example Interactions
 
 **Q&A Tutor Agent:**
@@ -186,6 +211,23 @@ Network traffic was captured using **Wireshark** during a full tutoring session.
 | API Key error | OpenAI key not set | Use `.env` file or switch to Llama via Ollama |
 | Slow inference | Large document chunks | Reduce chunk size in `ingest.py` |
 | External traffic warning | Optional tool misconfigured | Disable Google Search API |
+
+---
+
+## ⚡ Command Summary
+
+```bash
+# Environment setup
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Build local vector database
+python src/ingest.py
+
+# Launch the tutor
+chainlit run src/app.py -w
+```
 
 ---
 
